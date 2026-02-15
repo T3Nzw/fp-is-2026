@@ -8,7 +8,9 @@
 GHCup включва:
 
 - GHC (Glasgow Haskell Compiler) - компилатор на Хаскел;
-- GHCi - CLI, който използва GHC; най-често ще използваме него; Cabal - package manager за Haskell; HLS (Haskell Language Server).
+- GHCi - CLI, който използва GHC; най-често ще използваме него;
+- Cabal - package manager за Haskell;
+- HLS (Haskell Language Server).
 
 ### [VSCode](https://code.visualstudio.com/download)
 
