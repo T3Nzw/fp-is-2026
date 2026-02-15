@@ -16,6 +16,6 @@ GHCup включва:
 
 За Haskell ще са ни нужни и две разширения във VSCode:
 
-![VSCode_Extensions](./media/vscode-extensions.png)
+![VSCode_Extensions](./img/vscode-extensions.png)
 
 *Забележка*: Първото разширение директно инсталира и второто.
