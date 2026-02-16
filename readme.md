@@ -19,3 +19,17 @@ GHCup включва:
 ![VSCode_Extensions](./img/vscode-extensions.png)
 
 *Забележка*: Първото разширение директно инсталира и второто.
+
+## Ресурси
+
+- [Learn You a Haskell for Great Good!](https://learnyouahaskell.github.io/chapters.html)
+
+- [A Gentle Introduction to Haskell](https://www.haskell.org/tutorial/index.html)
+
+- [Haskell Programming from First Principles](https://haskellbook.com/)
+
+- [99 Haskell Problems](https://wiki.haskell.org/H-99:_Ninety-Nine_Haskell_Problems)
+
+- [A collection of Haskell problems (in Spanish)](https://www.cs.us.es/~jalonso/publicaciones/Piensa_en_Haskell.pdf)
+
+- [Haskell for Imperative Programmers](https://www.youtube.com/playlist?list=PLe7Ei6viL6jGp1Rfu0dil1JH1SHk9bgDV)
