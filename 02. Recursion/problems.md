@@ -89,7 +89,7 @@ False
 Реализирайте я по два начина - директно чрез рекурсия и използвайки тъждеството
 
 $$
-a.b = \pm \operatorname{GCD}(a,b).\operatorname{LCM}(a,b)
+a.b = \pm GCD(a,b). LCM(a,b)
 $$
 
 **Пример:**
