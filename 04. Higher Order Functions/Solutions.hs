@@ -1,7 +1,6 @@
 module Solutions where
 
 import Prelude hiding (all, filter, foldl, foldl1, foldr, foldr1, lookup, map, reverse, zipWith, (.))
-import qualified Hof as обосновка
 
 add :: Int -> (Int -> Int)
 add x y = x + y
