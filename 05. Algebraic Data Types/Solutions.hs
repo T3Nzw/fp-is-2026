@@ -1,5 +1,7 @@
 module Solutions where
 
+import Data.Function (on)
+
 -- типови синоними - не се създава нов тип
 type Point = (Double, Double)
 
@@ -88,4 +90,83 @@ getName (Person2 name age street streetNo) = name
 getAge :: Person2 -> Int
 getAge (Person2 _ age _ _) = age
 
+data Shape
+  = Circle Double
+  | Rectangle Double Double
+  | Triangle Point Point Point
+
+-- char *toString(int x) {...}
+-- char *toString(double x) {...}
+
+prettyPrint :: Shape -> String
+-- ad hoc полиморфизъм
+prettyPrint (Circle r) = "%%%" ++ "the figure is a circle with a radius of " ++ show r
+prettyPrint (Rectangle a b) = "%%%" ++ "the figure is a rectangle with sides " ++ show a ++ " and " ++ show b
+prettyPrint _ = "%%%" ++ "foo"
+
+prettyPrint' :: Shape -> String
+prettyPrint' shape =
+  "%%%" ++ case shape of
+    Circle r -> "the figure is a circle with a radius of " ++ show 5
+    Rectangle a b -> "rect"
+    _ -> "foo"
+
 -- newtype
+
+newtype IntSet = IntSet [Int]
+
+data Ordering2 = LT2 | EQ2 | GT2
+  deriving (Show, Eq, Ord, Enum, Bounded)
+
+sortBy :: (a -> a -> Ordering) -> [a] -> [a]
+sortBy _ [] = []
+sortBy cmp (pivot : xs) = sortBy cmp left ++ [pivot] ++ sortBy cmp right
+ where
+  -- x < pivot
+  -- x `cmp` pivot == LT
+  -- (`cmp` pivot) :: a -> Ordering
+  -- (== LT) :: Ordering -> Bool
+  -- a -> Bool
+  left' = filter ((== LT) . (`cmp` pivot)) xs
+  left =
+    filter
+      ( \x -> case x `cmp` pivot of
+          LT -> True
+          _ -> False
+      )
+      xs
+  -- >= pivot
+  -- [1,1,-1,1,6]
+  right = filter (\x -> x `cmp` pivot /= LT) xs
+
+data LineSegment = LineSegment {start :: Point, end :: Point}
+  deriving (Show, Eq, Ord)
+
+data Shape2
+  = Triangle2 Point Point Point
+  | Rectangle2 Double Double
+  | Circle2 LineSegment
+
+area :: Shape2 -> Double
+area (Triangle2 p1 p2 p3) = undefined
+area (Rectangle2 a b) = a * b
+area (Circle2 (LineSegment (x1, y1) (x2, y2))) = pi * r ^ 2
+ where
+  dx = x2 - x1
+  dy = y2 - y1
+  r = sqrt (dx * dx + dy * dy)
+
+sortShapes :: [Shape2] -> [Shape2]
+-- (Shape2, Double) -> (Shape2, Double) -> Ordering
+sortShapes shapes = map fst $ sortBy (\(s1, a1) (s2, a2) -> compare a1 a2) res1
+ where
+  areas = map area shapes
+  res1 = shapes `zip` areas
+
+-- on :: (b -> b -> c) -> (a -> b) -> a -> a -> c
+-- Shape2 -> Shape2 -> Ordering
+-- 1. (b -> b -> Ordering) ~ (Double -> Double -> Ordering)
+-- 2. (Shape2 -> b) ~ (Shape2 -> Double)
+-- b ~ Double
+sortShapes2 :: [Shape2] -> [Shape2]
+sortShapes2 shapes = sortBy (compare `on` area) shapes
