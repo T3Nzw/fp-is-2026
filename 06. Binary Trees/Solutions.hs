@@ -1,6 +1,7 @@
 module Solutions where
 
 import Data.Char
+import Data.List (partition)
 import Prelude hiding (Either (..), Maybe (..))
 
 data BinTree a = Empty | Node a (BinTree a) (BinTree a)
@@ -172,3 +173,129 @@ paths t = go [] t
   go acc (Node root left right) =
     let acc' = acc ++ [root]
      in go acc' left ++ go acc' right
+
+isBST :: Ord a => BinTree a -> Bool
+isBST Empty = True
+isBST (Node x left right) =
+  ( case (left, right) of
+      (Node y _ _, Node z _ _) -> y <= x && x < z
+      (Node y _ _, _) -> y <= x
+      (_, Node z _ _) -> x < z
+      _ -> True
+  )
+    && isBST left
+    && isBST right
+
+type BST = BinTree
+
+bst1 :: BST Int
+bst1 =
+  Node
+    2
+    (Node 1 Empty Empty)
+    (Node 3 Empty Empty)
+
+fromList :: Ord a => [a] -> BST a
+fromList [] = Empty
+fromList (x : xs) = Node x (fromList l) (fromList r)
+ where
+  (l, r) = partition (<= x) xs
+
+bst2 :: BST Int
+bst2 = fromList [5, 2, 61, 6, 6, 2]
+
+bst3 :: BST Int
+bst3 = fromList [1, 2, 3]
+
+remove :: Ord a => a -> BST a -> BST a
+remove _ Empty = Empty
+remove x (Node root left right)
+  | x == root =
+      if isEmpty left
+        then right
+        else
+          let (newRoot, newTree) = extractMin left in Node newRoot newTree right
+  | x < root = Node root (remove x left) right
+  | otherwise = Node root left (remove x right)
+
+extractMin :: BST a -> (a, BST a)
+extractMin Empty = error "wtf"
+extractMin (Node root Empty right) = (root, right)
+extractMin (Node root left right) =
+  let (min', tree) = extractMin left
+   in (min', Node root tree right)
+
+mirrored :: BST a -> BST a
+mirrored Empty = Empty
+mirrored (Node root left right) =
+  Node root (mirrored right) (mirrored left)
+
+isSymmetric :: BST a -> Bool
+isSymmetric Empty = True
+isSymmetric (Node _ left right) = go left right
+ where
+  go :: BST a -> BST a -> Bool
+  go Empty Empty = True
+  go (Node _ l1 r1) (Node _ l2 r2) =
+    go l1 r2 && go r1 l2
+  go _ _ = False
+
+rightSideView :: BST a -> [a]
+rightSideView t = map last $ levels t
+
+rotateLeft :: BBST a -> BBST a
+rotateLeft (Node x t1 (Node y t2 t3)) =
+  updateHeight $ Node y (updateHeight (Node x t1 t2)) t3
+rotateLeft t = t
+
+rotateRight :: BBST a -> BBST a
+rotateRight (Node x (Node y t1 t2) t3) =
+  updateHeight $ Node y t1 $ updateHeight (Node x t2 t3)
+
+bf :: BST a -> Int
+bf Empty = 0
+bf (Node _ left right) = height left - height right
+
+isBalanced :: BST a -> Bool
+isBalanced Empty = True
+isBalanced t@(Node _ left right) =
+  abs (bf t) <= 1 && isBalanced left && isBalanced right
+
+type BBST a = BST (Int, a)
+
+getHeight :: BBST a -> Int
+getHeight Empty = 0
+getHeight (Node (h, _) _ _) = h
+
+updateHeight :: BBST a -> BBST a
+updateHeight Empty = Empty
+updateHeight (Node (_, root) left right) =
+  let hl = getHeight left
+      hr = getHeight right
+   in Node (1 + max hl hr, root) left right
+
+construct :: BST a -> BBST a
+construct Empty = Empty
+construct (Node x left right) =
+  let left' = construct left
+      right' = construct right
+   in updateHeight $ Node (undefined, x) left' right'
+
+rotate :: BBST a -> BBST a
+rotate t = case bf t of
+  -2 -> rotateLeft . (if bf right == 1 then rotateRight else id) $ t
+  2 -> rotateRight . (if bf left == -1 then rotateLeft else id) $ t
+  _ -> t
+ where
+  Node _ left right = t
+
+balance :: BBST a -> BBST a
+balance Empty = Empty
+balance (Node root left right) =
+  let left' = balance left
+      right' = balance right
+      curr' = Node root left' right'
+   in updateHeight
+        $ if abs (bf curr') <= 1
+          then curr'
+          else rotate curr'
