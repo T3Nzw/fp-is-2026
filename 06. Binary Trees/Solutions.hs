@@ -2,6 +2,7 @@ module Solutions where
 
 import Data.Char
 import Data.List (partition)
+import GHC.ByteOrder (ByteOrder (BigEndian))
 import Prelude hiding (Either (..), Maybe (..))
 
 data BinTree a = Empty | Node a (BinTree a) (BinTree a)
@@ -16,7 +17,7 @@ bt :: BinTree Int
 bt =
   Node
     1
-    (Node 5 Empty Empty)
+    (Node (-2) Empty Empty)
     (Node 3 Empty Empty)
 
 bt2 :: BinTree (Int, Char)
@@ -161,7 +162,7 @@ bfs t = go [t]
   -- map :: (a -> b) -> [a] -> [b]
   -- map getChildren q :: [[BinTree a]]
   -- [BinTree a]
-  go q = map getRoot q : go (concat $ map getChildren q)
+  go q = map getRoot q : go (concatMap getChildren q)
 
 paths :: BinTree a -> [[a]]
 paths t = go [] t
@@ -299,3 +300,46 @@ balance (Node root left right) =
         $ if abs (bf curr') <= 1
           then curr'
           else rotate curr'
+
+mapTree :: (a -> b) -> BinTree a -> BinTree b
+mapTree _ Empty = Empty
+mapTree f (Node root left right) =
+  Node (f root) (mapTree f left) (mapTree f right)
+
+paths2 :: BinTree a -> [[a]]
+paths2 t = go t []
+ where
+  go :: BinTree a -> [a] -> [[a]]
+  go Empty _ = []
+  go (Node root Empty Empty) acc =
+    [acc ++ [root]]
+  go (Node root left right) acc =
+    let acc' = acc ++ [root]
+     in go left acc' ++ go right acc'
+
+verticalSentence :: String -> BinTree String -> Bool
+verticalSentence str bt = str' `elem` paths'
+ where
+  paths' = paths2 bt
+  str' = words str
+
+horizontalSentence :: String -> BinTree String -> Bool
+horizontalSentence str bt =
+  words str `elem` levels bt
+
+levelsWithEqSums :: BinTree Int -> Maybe (Int, Int)
+levelsWithEqSums bt =
+  case eqSums of
+    [] -> Nothing
+    (h : _) -> Just h
+ where
+  sums = map sum $ levels bt
+  indexedSums = [0 ..] `zip` sums
+
+  eqSums =
+    [ (m, n)
+    | (m, sum1) <- indexedSums
+    , (n, sum2) <- indexedSums
+    , sum1 == sum2
+    , m /= n
+    ]
